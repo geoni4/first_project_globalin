@@ -2,7 +2,7 @@ package com.project1.board.DO;
 
 public class Board {
 	private int bno;
-	private String title, content, writer, createDate, modifyDate;
+	private String title, content, writer, createdDate, modifiedDate;
 
 	public int getBno() {
 		return bno;
@@ -30,32 +30,33 @@ public class Board {
 	public void setWriter(String writer) {
 		this.writer = writer;
 	}
-	public String getCreateDate() {
-		return createDate;
+	public String getCreatedDate() {
+		return createdDate;
 	}
-	public void setCreateDate(String createDate) {
-		this.createDate = createDate;
+	public void setCreatedDate(String createdDate) {
+		this.createdDate = createdDate;
 	}
-	public String getModifyDate() {
-		return modifyDate;
+	public String getModifiedDate() {
+		return modifiedDate;
 	}
-	public void setModifyDate(String modifyDate) {
-		this.modifyDate = modifyDate;
+	public void setModifiedDate(String modifiedDate) {
+		this.modifiedDate = modifiedDate;
 	}
 	
 	public Board() {}
 	
-	public Board(int bno, String title, String content, String writer, String createDate, String modifyDate) {
+	public Board(int bno, String title, String content, String writer, String createdDate, String modifiedDate) {
 		this.bno = bno;
 		this.title = title;
 		this.content = content;
 		this.writer = writer;
-		this.createDate = createDate;
-		this.modifyDate = modifyDate;
+		this.createdDate = createdDate;
+		this.modifiedDate = modifiedDate;
 	}
+	
 	@Override
 	public String toString() {
-		return bno + "\t" + title + '\t' + writer + '\t' + createDate + '\t' + modifyDate ;
+		return bno + "\t" + title + '\t' + writer + '\t' + createdDate + '\t' + modifiedDate ;
 	}
 	
 	

@@ -12,6 +12,10 @@ public class BoardService {
 	public BoardService() {
 		dao = new BoardDAO();
 	}
+	
+	public List<Board> findPartailinPage(int page){
+		return dao.getAllinPage(page);
+	}
 
 	public List<Board> findAll(){
 		return dao.getAll();
