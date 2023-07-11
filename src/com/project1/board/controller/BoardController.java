@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.project1.board.DO.Board;
@@ -39,7 +40,7 @@ public class BoardController {
 				String titleStr = "  제목                ";
 				String writerStr = "  작성자        ";
 				String createdDateStr = " 작성 날짜                          ";
-				tmp.append(bnoStr).append("|").append(titleStr).append("|").append(writerStr).append("|")
+				tmp.append(bnoStr).append(" |").append(titleStr).append(" |").append(writerStr).append(" |")
 						.append(createdDateStr).append(" |\n");
 				if (boardList == null || boardList.size() == 0) {
 					tmp = new StringBuilder().append("글이 없습니다.");
@@ -88,7 +89,7 @@ public class BoardController {
 			String titleStr = "  제목                ";
 			String writerStr = "  작성자        ";
 			String createdDateStr = " 작성 날짜                          ";
-			tmp.append(bnoStr).append("|").append(titleStr).append("|").append(writerStr).append("|")
+			tmp.append(" ").append(bnoStr).append("|").append(titleStr).append("|").append(writerStr).append("|")
 					.append(createdDateStr).append("|\n");
 			if (boardList != null) {
 				for (Board board : boardList) {
@@ -272,14 +273,14 @@ public class BoardController {
 
 	public String addSpace(String std, String insertStr) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(" ");
 		String tmp = insertStr;
-		if (insertStr.length() >= std.length()) {
-			tmp = insertStr.substring(0, std.length() - 4);
+		sb.append(" ");
+		if(toAsciiLength(std) <= toAsciiLength(insertStr)) {
+			tmp = insertStr.substring(0, getIdx(std, insertStr));
 			tmp += "...";
 		}
 		sb.append(tmp);
-		for (int i = tmp.length(); i < std.length(); i++) {
+		for (int i = toAsciiLength(tmp); i < toAsciiLength(std); i++) {
 			sb.append(" ");
 		}
 		return sb.toString();
@@ -292,24 +293,36 @@ public class BoardController {
 	
 	public int isAscii(char charValue) {
 		try {
-			if( charValue >= 128)
-				return 2;
+			if( charValue >= 128) {
+				return 3;
+			}
 		} catch (NumberFormatException ex) {
 		}
-		return 1;
+		return 2;
 	}
 	
-	public int toAsciiLength(String str) {
-		int length = 0;
-		for(int i =0;i<str.length();i++) {
-			length += isAscii(str.charAt(i));
+	public int getIdx(String std, String insertStr) {
+		int idx=0;
+		int doubleLen = 0 ;
+		for(int i =0;i<insertStr.length();i++) {
+			doubleLen += isAscii(insertStr.charAt(i));
+			idx = i;
+			if(doubleLen/2 >= toAsciiLength(std) -4) break;
 		}
+		return idx;
+	}
+	public int toAsciiLength(String str) {
+		int doubleLen = 0;
+		for(int i =0;i<str.length();i++) {
+			doubleLen += isAscii(str.charAt(i));
+		}
+		int length = doubleLen/2;
 		return length;
 	}
 	
 	public int toAsciiLength(int integer) {
-		String insertStr = String.valueOf(integer);
-		return toAsciiLength(insertStr);
+		String intStr = String.valueOf(integer);
+		return toAsciiLength(intStr);
 	}
 
 	public void defaultMethod() throws IOException {
