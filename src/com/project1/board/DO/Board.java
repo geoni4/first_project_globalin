@@ -58,6 +58,4 @@ public class Board {
 	public String toString() {
 		return bno + "\t" + title + '\t' + writer + '\t' + createdDate + '\t' + modifiedDate ;
 	}
-	
-	
 }

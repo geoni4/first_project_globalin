@@ -4,7 +4,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.project1.board.DO.Board;
@@ -27,36 +26,46 @@ public class BoardController {
 		}
 	}
 
+	
+	
+	
+	
 	public void getPartialList() {
 		int page = 1;
-		int tmpPage = 1;
+
 		String occupy = "1";
 		try {
 			while (true) {
 				int allPage = (boardService.findAll().size()-1)/5+1;
 				List<Board> boardList = boardService.findPartailinPage(page);
 				StringBuilder tmp = new StringBuilder();
-				String bnoStr = "글번호     ";
+				String bnoStr = " 글번호     ";
 				String titleStr = "  제목                ";
 				String writerStr = "  작성자        ";
 				String createdDateStr = " 작성 날짜                          ";
-				tmp.append(bnoStr).append(" |").append(titleStr).append(" |").append(writerStr).append(" |")
-						.append(createdDateStr).append(" |\n");
+				tmp.append("===============================================================================================\n")
+					.append("|").append(bnoStr).append(" |")
+					.append(titleStr).append(" |")
+					.append(writerStr).append(" |")
+					.append(createdDateStr).append(" |\n")
+					.append("|-------------|-----------------------|-----------------|-------------------------------------|\n");
 				if (boardList == null || boardList.size() == 0) {
 					tmp = new StringBuilder().append("글이 없습니다.");
 					occupy = "0";
 				}
 				if (boardList != null) {
 					for (Board board : boardList) {
-						tmp.append(addSpace(bnoStr, board.getBno())).append("|")
+						tmp.append("|").append(addSpace(bnoStr, board.getBno())).append("|")
 								.append(addSpace(titleStr, board.getTitle())).append("|")
 								.append(addSpace(writerStr, board.getWriter())).append("|")
 								.append(addSpace(createdDateStr, board.getCreatedDate())).append("|\n");
 					}
-					tmp.append("현재 페이지 : ").append(page).append(", ").append(page).append(" / ")
-					.append(allPage).append("\n")
-					.append("명령어를 입력하세요. (<: 왼쪽 페이지, >: 오른쪽 페이지, 숫자: 해당 페이지, ")
-					.append("0 or 1페이지에서 <: 목록 출력 종료)");
+					tmp.append("===============================================================================================\n")
+						.append("\n현재 페이지 : ").append(page).append(", ").append(page).append(" / ")
+						.append(allPage).append(" |  총 글 개수: " + boardService.findAll().size()).append("\n\n")
+						.append("명령어를 입력하세요.\n")
+						.append("(<: 왼쪽 페이지, >: 오른쪽 페이지, <<: 첫 페이지, >>: 끝 페이지)\n")
+						.append("(숫자: 해당 페이지, 0: 목록 출력 종료)");
 				}
 				String summaryString = tmp.toString();
 				if(occupy.equals("0")) {
@@ -65,22 +74,30 @@ public class BoardController {
 				}
 				send(occupy, summaryString);
 				String cmd = in.readUTF();
-				if (">".equals(cmd))	tmpPage++;
-				if ("<".equals(cmd))	tmpPage--;
-				if (isInteger(cmd)) {
-					tmpPage = Integer.valueOf(cmd);
-				}
-				if (tmpPage > allPage || tmpPage < 0)	{
-					tmpPage = page;
-					continue;
-				}
-				page = tmpPage;
+
+				page = partialListMenu(cmd, allPage, page);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+	
+	public int partialListMenu(String cmd, int allPage, int page) {
+		int tmpPage = page;
+		if (">".equals(cmd))	tmpPage = tmpPage+1 >= allPage ? allPage : tmpPage+1;
+		if ("<".equals(cmd))	tmpPage = tmpPage <= 1 ? 1 : tmpPage-1;
+		if(">>".equals(cmd))	tmpPage = allPage;
+		if("<<".equals(cmd))	tmpPage = 1;
+		if (isInteger(cmd)) {
+			tmpPage = (0 <= Integer.valueOf(cmd)) && (Integer.valueOf(cmd) <= allPage) ? Integer.valueOf(cmd) : tmpPage;
+		}
+		return tmpPage;
+	}
 
+	
+	
+	
+	
 	public void getList() {
 		List<Board> boardList = boardService.findAll();
 		try {
@@ -110,6 +127,11 @@ public class BoardController {
 		}
 	}
 
+
+	
+	
+	
+	
 	public void createContent() {
 		Board board = new Board();
 		try {
@@ -130,6 +152,10 @@ public class BoardController {
 		}
 	}
 
+	
+	
+	
+	
 	public void getDetailContent() {
 		int bno;
 		try {
@@ -161,6 +187,10 @@ public class BoardController {
 		}
 	}
 
+	
+	
+	
+	
 	public void deleteContent() {
 		int bno = 0;
 		try {
@@ -180,6 +210,10 @@ public class BoardController {
 		}
 	}
 
+	
+	
+	
+	
 	public void modifyContent() {
 		int bno = 0;
 		try {
@@ -246,6 +280,18 @@ public class BoardController {
 		}
 	}
 
+	
+	
+	
+	
+	public void defaultMethod() throws IOException {
+		send("0", "메뉴를 입력하세요.");
+	}
+	
+	
+	
+	
+	
 	public void close() {
 		try {
 			send("0", "종료합니다.");
@@ -262,6 +308,10 @@ public class BoardController {
 		out.flush();
 	}
 
+	
+	
+	
+	
 	public static boolean isInteger(String strValue) {
 		try {
 			Integer.parseInt(strValue);
@@ -271,6 +321,7 @@ public class BoardController {
 		}
 	}
 
+	
 	public String addSpace(String std, String insertStr) {
 		StringBuilder sb = new StringBuilder();
 		String tmp = insertStr;
@@ -291,15 +342,16 @@ public class BoardController {
 		return addSpace(std, insertStr);
 	}
 	
+
+	
+
 	public int isAscii(char charValue) {
-		try {
-			if( charValue >= 128) {
-				return 3;
-			}
-		} catch (NumberFormatException ex) {
+		if (charValue >= 128) {
+			return 4;
 		}
 		return 2;
 	}
+	
 	
 	public int getIdx(String std, String insertStr) {
 		int idx=0;
@@ -311,6 +363,8 @@ public class BoardController {
 		}
 		return idx;
 	}
+
+	
 	public int toAsciiLength(String str) {
 		int doubleLen = 0;
 		for(int i =0;i<str.length();i++) {
@@ -325,8 +379,5 @@ public class BoardController {
 		return toAsciiLength(intStr);
 	}
 
-	public void defaultMethod() throws IOException {
-		send("0", "메뉴를 입력하세요.");
-	}
 
 }

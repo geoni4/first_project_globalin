@@ -53,18 +53,19 @@ public class BoardDAO {
 	}
 
 	public List<Board> getAllinPage(int page){
-		int bno = 0, bcnt = 0;
+		int bno = 0;
 		List<Board> boardList = new ArrayList<>();
 		try {
 			br = new BufferedReader(new FileReader(bnoPathString));
 			bno = Integer.valueOf(br.readLine());
-			br.close();
-			br = new BufferedReader(new FileReader(bcntPathString));
-			bcnt = Integer.valueOf(br.readLine());
-			br.close();
 		} catch (Exception e) {
 			System.out.println("bno.txt 파일 이상 발생");
 			return boardList;
+		} finally {
+			try {
+			br.close();
+			} catch (Exception e) {
+			}
 		}
 		
 		try {
@@ -191,22 +192,31 @@ public class BoardDAO {
 		try {
 			br = new BufferedReader(new FileReader(bcntPathString));
 	    	bcnt = Integer.valueOf(br.readLine());
-	    	br.close();
 		} catch (Exception e) {
 			System.out.println("cnt.txt 접근 실패");
+		} finally {
+			try {
+			br.close();
+			} catch (Exception e) {
+			}
 		}
 		
 		try {
 			if(bcnt == 0) throw new Exception();
 	    	bw = new BufferedWriter(new FileWriter(bcntPathString));
 	    	bw.write(String.valueOf(--bcnt));
-	    	bw.close();
 			String deleteFileName = bPathString +bno + ".txt";
 			File file = new File(deleteFileName);
 			return file.delete();
 		} catch (Exception e) {
 			System.out.println("자료 접근 실패");
 			return false;
+		} finally {
+			try {
+				bw.close();
+			}catch (Exception e) {
+				// TODO: handle exception
+			}
 		}
 	}
 	
