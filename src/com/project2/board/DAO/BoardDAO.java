@@ -1,4 +1,4 @@
-package com.project1.board.DAO;
+package com.project2.board.DAO;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
