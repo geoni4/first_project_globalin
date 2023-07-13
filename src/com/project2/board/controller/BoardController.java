@@ -330,7 +330,6 @@ public class BoardController {
 	
 	public void close() {
 		try {
-			send("0", "종료합니다.");
 			out.close();
 			in.close();
 		} catch (Exception e) {

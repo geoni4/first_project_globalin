@@ -62,7 +62,7 @@ public class BoardClient {
 					System.out.println(data);
 				}
 			} catch (Exception e) {
-				System.out.println("[클라이언트] 서버 연결 끊김");
+				System.out.println("연결을 종료합니다.");
 				System.exit(0);
 			}
 		});

@@ -60,7 +60,6 @@ public class SocketClient {
 						boardController.modifyContent();
 					} else if("0".equals(command)) {
 						boardController.close();
-						close();
 						break;
 					} else {
 						System.out.println("메뉴 입력 안 됨");
@@ -70,6 +69,7 @@ public class SocketClient {
 			}catch (Exception e) {
 				System.out.println("접속 종료.");
 				boardServer.removeSocketClient(this);
+				close();
 			}
 		});
 	}
