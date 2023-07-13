@@ -37,22 +37,12 @@ public class SocketClient {
 		boardServer.getThreadPool().execute(()->{
 			BoardController boardController = new BoardController(socket);
 			try {
+				boardServer.addSocketClient(this);
 				while(true) {
-					String receiveJson = in.readUTF();
-					JSONObject jsonObject = new JSONObject(receiveJson);
-					String position = jsonObject.getString("position");
+					//System.out.println(receiveJson.toString());
+					JSONObject jsonObject = new JSONObject(in.readUTF());
 					String command = jsonObject.getString("command");
 					
-					switch (position) {
-					case "main":
-						System.out.println("메뉴 입력");
-						boardServer.addSocketClient(this);
-						break;
-					case "in-menu":
-						String message = jsonObject.getString("data");
-						boardServer.send(this, message);
-						break;
-					}
 					if("1".equals(command)) {
 						System.out.println("리스트 출력");
 						boardController.getPartialList();
@@ -69,7 +59,6 @@ public class SocketClient {
 						System.out.println("게시물 수정");
 						boardController.modifyContent();
 					} else if("0".equals(command)) {
-						System.out.println("접속 종료.");
 						boardController.close();
 						close();
 						break;
@@ -79,6 +68,7 @@ public class SocketClient {
 					}
 				}
 			}catch (Exception e) {
+				System.out.println("접속 종료.");
 				boardServer.removeSocketClient(this);
 			}
 		});

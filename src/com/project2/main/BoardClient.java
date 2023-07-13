@@ -16,30 +16,32 @@ public class BoardClient {
 			BoardClient boardClient = new BoardClient();
 			boardClient.setPosition("main");
 			boardClient.connect();
+			String command = "";
 
 			JSONObject jsonObject = new JSONObject();
 			jsonObject.put("position", position);
-			jsonObject.put("command", "1");
-			
+			jsonObject.put("data", "");
+			jsonObject.put("command", "");
+
 			String json = jsonObject.toString();
-			
+
 			boardClient.send(json);
-			
 			boardClient.receive();
-			
+
 			Scanner scanner = new Scanner(System.in);
-			
-			while(true) {
-				String command = scanner.nextLine();
-				if(command.equals("0") && position.equals("main")) break;
-				
+
+			while (true) {
+				command = scanner.nextLine();
+				if (command.equals("0") && position.equals("main"))
+					break;
+
 				jsonObject = new JSONObject();
-				jsonObject.put("position", position);
+				jsonObject.put("position", boardClient.getPosition());
 				jsonObject.put("command", command);
-				json = jsonObject.toString();
-				boardClient.send(json);
+
+				boardClient.send(jsonObject.toString());
 			}
-			
+
 			scanner.close();
 			boardClient.unconnect();
 		} catch (Exception e) {
@@ -50,20 +52,22 @@ public class BoardClient {
 
 	private void receive() {
 		Thread thread = new Thread(() -> {
+			// TODO Auto-generated method stub
 			try {
 				while (true) {
 					String json = in.readUTF();
 					JSONObject root = new JSONObject(json);
-					String message = root.getString("message");
-					System.out.println(message);
+					setPosition(root.getString("position"));
+					String data = root.getString("data");
+					System.out.println(data);
 				}
 			} catch (Exception e) {
 				System.out.println("[클라이언트] 서버 연결 끊김");
 				System.exit(0);
 			}
-		}) ;
+		});
+
 		thread.start();
-		
 	}
 
 	private Socket socket = null;
@@ -80,24 +84,22 @@ public class BoardClient {
 
 		System.out.println("서버에 연결 되었습니다.");
 	}
-	
+
 	public synchronized void setPosition(String position) {
 		BoardClient.position = position;
 	}
-	
+
 	public synchronized String getPosition() {
 		return position;
 	}
-	
+
 	public void send(String json) throws IOException {
 		out.writeUTF(json);
 		out.flush();
-	}//send()
-	
+	}// send()
+
 	public void unconnect() throws IOException {
 		socket.close();
-	}//unconnect()
-	
-	
+	}// unconnect()
 
 }

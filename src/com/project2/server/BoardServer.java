@@ -38,6 +38,7 @@ public class BoardServer{
 				
 			}
 		});
+		thread.start();
 	}
 
 
@@ -45,54 +46,6 @@ public class BoardServer{
 	private ExecutorService threadPool = Executors.newFixedThreadPool(100);
 	private final int PORT = 7878;
 	private Map<String, SocketClient> boardConn = Collections.synchronizedMap(new HashMap<String, SocketClient>()) ;
-
-	
-
-//	public void run() {
-//		String menu;
-//		BoardController boardController = new BoardController(socket);
-//		try {
-//			while (true) {
-//				if(out == null) break;
-//				if(in == null) break;
-//				menu = "1";
-//				try {
-//					System.out.println("메뉴 입력");
-//					menu = in.readUTF();
-//					System.out.println(menu);
-//				} catch (Exception e) {
-//					System.out.println("메뉴를 잘 입력하세요.");
-//				}
-//				if("1".equals(menu)) {
-//					System.out.println("리스트 출력");
-//					boardController.getPartialList();
-//				} else if("2".equals(menu)) {
-//					System.out.println("게시글 등록");
-//					boardController.createContent();
-//				} else if("3".equals(menu)) {
-//					System.out.println("게시물 내용");
-//					boardController.getDetailContent();
-//				} else if ("4".equals(menu)) {
-//					System.out.println("게시물 삭제");
-//					boardController.deleteContent();
-//				} else if ("5".equals(menu)) {
-//					System.out.println("게시물 수정");
-//					boardController.modifyContent();
-//				} else if("0".equals(menu)) {
-//					System.out.println("접속 종료.");
-//					boardController.close();
-//					close();
-//					break;
-//				} else {
-//					System.out.println("메뉴 입력 안 됨");
-//					boardController.defaultMethod();
-//				}
-//			}
-//		}catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		
-//	}
 	
 
 	public void removeSocketClient(SocketClient socketClient) {
@@ -106,7 +59,7 @@ public class BoardServer{
 		String key = socketClient.randomNum + "@" + socketClient.clientIP;
 		boardConn.put(key, socketClient);
 		System.out.println("입장: " + key);
-		System.out.println("현재 채팅자 수: " + boardConn.size() + '\n');
+		System.out.println("현재 접속인원 수: " + boardConn.size() + '\n');
 	}
 	
 	public void send(SocketClient sender, String command) {

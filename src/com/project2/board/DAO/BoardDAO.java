@@ -229,8 +229,8 @@ public class BoardDAO {
 		
 	    try {
 	    	String writeFileName = bPathString + board.getBno() + ".txt";
-	    	StringBuilder tmp = new StringBuilder();
-	    	tmp.append(board.getBno()).append('\n')
+	    	StringBuilder tmp = new StringBuilder()
+	    		.append(board.getBno()).append('\n')
 	    		.append(board.getTitle()).append('\n')
 	    		.append(board.getContent()).append('\n')
 	    		.append(board.getWriter()).append('\n')
