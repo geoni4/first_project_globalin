@@ -8,6 +8,7 @@ import java.net.Socket;
 import org.json.JSONObject;
 
 import com.project2.board.controller.BoardController;
+import com.project2.main.BoardServer;
 
 
 public class SocketClient {
@@ -19,6 +20,30 @@ public class SocketClient {
 	String randomNum;
 	
 	
+	public Socket getSocket() {
+		return socket;
+	}
+
+	public void setSocket(Socket socket) {
+		this.socket = socket;
+	}
+
+	public String getClientIP() {
+		return clientIP;
+	}
+
+	public void setClientIP(String clientIP) {
+		this.clientIP = clientIP;
+	}
+
+	public String getRandomNum() {
+		return randomNum;
+	}
+
+	public void setRandomNum(String randomNum) {
+		this.randomNum = randomNum;
+	}
+
 	public SocketClient(BoardServer boardServer, Socket socket) {
 		try {
 			this.boardServer = boardServer;
@@ -67,6 +92,7 @@ public class SocketClient {
 					}
 				}
 			}catch (Exception e) {
+				System.out.println();
 				System.out.println("접속 종료.");
 				boardServer.removeSocketClient(this);
 				close();
