@@ -8,36 +8,33 @@ import java.util.Scanner;
 
 import org.json.JSONObject;
 
-import com.project1.client.ClientTransfer;
 
 public class BoardClient {
 	public static void main(String[] args) {
 		try {
 			BoardClient boardClient = new BoardClient();
 			position = "main";
-			boardClient.connect();
 			String command = "";
+			boardClient.connect();
 
-			JSONObject jsonObject = new JSONObject();
-			jsonObject.put("position", position);
-			jsonObject.put("data", "");
-			jsonObject.put("command", "");
+			JSONObject jsonObject = new JSONObject()
+					.put("position", position)
+					.put("data", "")
+					.put("command", command);
 
-			String json = jsonObject.toString();
-
-			boardClient.send(json);
+			boardClient.send(jsonObject.toString());
 			boardClient.receive();
 
 			Scanner scanner = new Scanner(System.in);
 
 			while (true) {
 				command = scanner.nextLine();
-				if (command.equals("0") && position.equals("main"))
+				if ("0".equals(command) && "main".equals(position))
 					break;
 
-				jsonObject = new JSONObject();
-				jsonObject.put("position", position);
-				jsonObject.put("command", command);
+				jsonObject = new JSONObject()
+						.put("position", position)
+						.put("command", command);
 
 				boardClient.send(jsonObject.toString());
 			}
@@ -55,10 +52,9 @@ public class BoardClient {
 			// TODO Auto-generated method stub
 			try {
 				while (true) {
-					String json = in.readUTF();
-					JSONObject root = new JSONObject(json);
-					position = root.getString("position");
-					String data = root.getString("data");
+					JSONObject receive = new JSONObject(in.readUTF());
+					position = receive.getString("position");
+					String data = receive.getString("data");
 					System.out.println(data);
 				}
 			} catch (Exception e) {
@@ -93,6 +89,6 @@ public class BoardClient {
 
 	public void unconnect() throws IOException {
 		socket.close();
-	}// unconnect()
+	}
 
 }

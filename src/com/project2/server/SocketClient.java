@@ -50,8 +50,7 @@ public class SocketClient {
 			this.socket = socket;
 			this.in = new DataInputStream(socket.getInputStream());
 			this.out = new DataOutputStream(socket.getOutputStream());
-			InetSocketAddress isa = (InetSocketAddress)socket.getRemoteSocketAddress();
-			this.clientIP = isa.getHostName();
+			this.clientIP = ((InetSocketAddress)socket.getRemoteSocketAddress()).getHostName();
 			this.randomNum = String.valueOf((int)(Math.random()*1000000));
 			receive();
 		} catch(Exception e) {
@@ -65,8 +64,7 @@ public class SocketClient {
 				boardServer.addSocketClient(this);
 				while(true) {
 					//System.out.println(receiveJson.toString());
-					JSONObject jsonObject = new JSONObject(in.readUTF());
-					String command = jsonObject.getString("command");
+					String command = new JSONObject(in.readUTF()).getString("command");
 					
 					if("1".equals(command)) {
 						System.out.println("리스트 출력");
@@ -88,7 +86,7 @@ public class SocketClient {
 						break;
 					} else {
 						System.out.println("메뉴 입력 안 됨");
-						boardController.defaultMethod();
+						boardController.defaultMenu();
 					}
 				}
 			}catch (Exception e) {

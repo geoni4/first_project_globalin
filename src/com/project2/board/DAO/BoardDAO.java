@@ -17,7 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.project1.board.DO.Board;
+import com.project2.board.DO.Board;
 
 
 public class BoardDAO {
@@ -49,6 +49,11 @@ public class BoardDAO {
 			}
 		}catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				bw.close();
+			} catch (Exception e2) {
+			}
 		}
 	}
 
@@ -64,7 +69,7 @@ public class BoardDAO {
 		} finally {
 			try {
 			br.close();
-			} catch (Exception e) {
+			} catch (Exception e2) {
 			}
 		}
 		
@@ -76,11 +81,13 @@ public class BoardDAO {
 				if(board == null ) continue;
 				boardTmpList.add(board);
 			}
+			if(boardTmpList.size() == 0)  throw new Exception();
 			for(int no =(page-1)*5 ; no<boardTmpList.size();no++) {
 				boardList.add(boardTmpList.get(no));
 			}
 		}catch (Exception e) {
-			// TODO: handle exception
+			System.out.println("자료가 없습니다.");
+			return null;
 		}
 		
 		
@@ -94,11 +101,16 @@ public class BoardDAO {
 		try {
 			br = new BufferedReader(new FileReader(bnoPathString));
 			bno = Integer.valueOf(br.readLine());
-			br.close();
 		} catch (Exception e) {
 			System.out.println("bno.txt 파일 이상 발생");
 			return boardList;
-		} 
+		} finally {
+			try {
+			br.close();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+		}
 		try {
 
 			for(int no = 1 ; no <= bno ; no++) {
@@ -106,9 +118,10 @@ public class BoardDAO {
 				if(board == null) continue;
 				boardList.add(board);
 			}
+			if(boardList.size() == 0)  throw new Exception();
 		} catch (Exception e) {
 			System.out.println("자료가 없습니다.");
-			boardList = null;
+			return null;
 		}
 		return boardList;
 	}
@@ -175,13 +188,14 @@ public class BoardDAO {
 			board.setCreatedDate(br.readLine());
 			board.setModifiedDate(br.readLine());
 			
-			br.close();
-		} catch(FileNotFoundException e) {
-			//System.out.println("파일이 없습니다.");
-		} catch(IOException e) {
-			System.out.println("파일 IO오류");
-		} catch (NullPointerException e) {
-			System.out.println("자료가 없습니다.");
+			
+		} catch(Exception e1) {
+			board = null;
+		} finally {
+			try {
+				br.close();	
+			}catch (Exception e2) {
+			}
 		}
 		
 		return board;
@@ -194,9 +208,10 @@ public class BoardDAO {
 	    	bcnt = Integer.valueOf(br.readLine());
 		} catch (Exception e) {
 			System.out.println("cnt.txt 접근 실패");
+			return false;
 		} finally {
 			try {
-			br.close();
+				br.close();
 			} catch (Exception e) {
 			}
 		}
@@ -238,11 +253,16 @@ public class BoardDAO {
 	    		.append(date).append('\n');
 	    	bw = new BufferedWriter(new FileWriter(writeFileName));
 	    	bw.write(tmp.toString());
-	    	bw.close();
+	    	
 	    	
 	    } catch(Exception e) {
 	    	System.out.println("update 오류");
 	    	return;
+	    } finally {
+	    	try {
+	    		bw.close();
+	    	}catch (Exception e) {
+			}
 	    }
 		System.out.println("글 수정이 완료되었습니다.");
 	}

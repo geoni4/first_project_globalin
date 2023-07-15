@@ -2,8 +2,8 @@ package com.project2.board.service;
 
 import java.util.List;
 
-import com.project1.board.DAO.BoardDAO;
-import com.project1.board.DO.Board;
+import com.project2.board.DAO.BoardDAO;
+import com.project2.board.DO.Board;
 
 public class BoardService {
 	private BoardDAO dao =null;
@@ -13,7 +13,7 @@ public class BoardService {
 		dao = new BoardDAO();
 	}
 	
-	public List<Board> findPartailinPage(int page){
+	public List<Board> findPartialinPage(int page){
 		return dao.getAllinPage(page);
 	}
 

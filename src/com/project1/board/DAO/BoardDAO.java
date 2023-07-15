@@ -176,12 +176,9 @@ public class BoardDAO {
 			board.setModifiedDate(br.readLine());
 			
 			br.close();
-		} catch(FileNotFoundException e) {
-			//System.out.println("파일이 없습니다.");
-		} catch(IOException e) {
-			System.out.println("파일 IO오류");
-		} catch (NullPointerException e) {
+		} catch (Exception e) {
 			System.out.println("자료가 없습니다.");
+			return null;
 		}
 		
 		return board;
@@ -221,12 +218,10 @@ public class BoardDAO {
 	}
 	
 	public void update(Board board) {
-		LocalDateTime localDateTime = null;
-		localDateTime = LocalDateTime.of(LocalDate.now(), LocalTime.now());
+		LocalDateTime localDateTime = LocalDateTime.of(LocalDate.now(), LocalTime.now());
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MMM dd, yyyy, h:mm:ss a");
 		String date = localDateTime.format(dtf);
 
-		
 	    try {
 	    	String writeFileName = bPathString + board.getBno() + ".txt";
 	    	StringBuilder tmp = new StringBuilder();
@@ -238,11 +233,16 @@ public class BoardDAO {
 	    		.append(date).append('\n');
 	    	bw = new BufferedWriter(new FileWriter(writeFileName));
 	    	bw.write(tmp.toString());
-	    	bw.close();
+
 	    	
 	    } catch(Exception e) {
 	    	System.out.println("update 오류");
 	    	return;
+	    } finally {
+	    	try {
+		    	bw.close();
+	    	}catch (Exception e) {
+			}
 	    }
 		System.out.println("글 수정이 완료되었습니다.");
 	}

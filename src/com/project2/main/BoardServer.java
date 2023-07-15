@@ -66,13 +66,11 @@ public class BoardServer{
 	
 	public void send(SocketClient sender, String command) {
 		JSONObject root = new JSONObject();
-		root.put("randomNum",  sender.getRandomNum());
-		root.put("clientIP",  sender.getClientIP());
-		root.put("command",  command);
+		root.put("randomNum",  sender.getRandomNum())
+			.put("clientIP",  sender.getClientIP())
+			.put("command",  command);
 		
-		String json = root.toString();
-
-		sender.send(json);
+		sender.send(root.toString());
 	}
 	
 
@@ -83,7 +81,6 @@ public class BoardServer{
 			boardConn.values().stream().forEach(sc -> sc.close());
 			
 		}catch (Exception e) {
-			// TODO: handle exception
 		}
 	}
 	

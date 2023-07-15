@@ -8,8 +8,8 @@ import java.util.List;
 
 import org.json.JSONObject;
 
-import com.project1.board.DO.Board;
-import com.project1.board.service.BoardService;
+import com.project2.board.DO.Board;
+import com.project2.board.service.BoardService;
 
 public class BoardController {
 	private BoardService boardService = null;
@@ -24,7 +24,6 @@ public class BoardController {
 			in = new DataInputStream(this.socket.getInputStream());
 			out = new DataOutputStream(this.socket.getOutputStream());
 		} catch (Exception e) {
-			// TODO: handle exception
 		}
 	}
 
@@ -35,24 +34,24 @@ public class BoardController {
 	public void getPartialList() {
 		int page = 1;
 
-		                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
 		String command = "1";
 		try {
 			while (true) {
-				int allPage = (boardService.findAll().size()-1)/5+1;
-				List<Board> boardList = boardService.findPartailinPage(page);
-				JSONObject jsonObject = new JSONObject();
+				List<Board> boardList = boardService.findPartialinPage(page);
+				
 				String position = "in-menu";
 				StringBuilder tmp = new StringBuilder();
 				String bnoStr = " 글번호     ";
 				String titleStr = "  제목                ";
 				String writerStr = "  작성자        ";
 				String createdDateStr = " 작성 날짜                          ";
-				if(boardList.size() ==0 ) {
-					if(allPage == 0) tmp = new StringBuilder().append("글이 없습니다.");
-					position = "main";
-				}
-				else {
+				int allPage = 1;
+				if(boardList == null ) {
+					tmp = new StringBuilder().append("글이 없습니다.");
+					command = "0";
+				} else {
+					int allPost = boardService.findAll().size();
+					allPage= (allPost-1)/5+1;
 					tmp.append("===============================================================================================\n")
 						.append("|").append(bnoStr).append(" |")
 						.append(titleStr).append(" |")
@@ -67,25 +66,24 @@ public class BoardController {
 					}
 					tmp.append("===============================================================================================\n")
 						.append("\n현재 페이지 : ").append(page).append(", ").append(page).append(" / ")
-						.append(allPage).append(" |  총 글 개수: " + boardService.findAll().size()).append("\n\n")
+						.append(allPage).append(" |  총 글 개수: " + allPost).append("\n\n")
 						.append("명령어를 입력하세요.\n")
 						.append("(<: 왼쪽 페이지, >: 오른쪽 페이지, <<: 첫 페이지, >>: 끝 페이지)\n")
 						.append("(숫자: 해당 페이지, 0: 목록 출력 종료)");
 				}
 				String summaryString = tmp.toString();
 				
-				
-				jsonObject.put("position", position)
+				JSONObject jsonObject = new JSONObject()
+						.put("position", position)
 						.put("data",summaryString);
 				String json = jsonObject.toString();
-				if(command.equals("0")) {
-					defaultMethod(json);
+				if("0".equals(command)) {
+					defaultMenu(json);
 					return;
 				}
 				send(json);
 				
-				JSONObject rJsonObject = new JSONObject(in.readUTF());
-				command = rJsonObject.getString("command");
+				command = receiveCommand();
 
 				page = partialListMenu(command, allPage, page);
 			}
@@ -109,76 +107,47 @@ public class BoardController {
 	
 	
 	
-	
-	public void getList() {
-		List<Board> boardList = boardService.findAll();
-		StringBuilder tmp = new StringBuilder();
-		String bnoStr = "글번호     ";
-		String titleStr = "  제목                ";
-		String writerStr = "  작성자        ";
-		String createdDateStr = " 작성 날짜                          ";
-		tmp.append(" ").append(bnoStr).append("|").append(titleStr).append("|").append(writerStr).append("|")
-				.append(createdDateStr).append("|\n");
-		if (boardList != null) {
-			for (Board board : boardList) {
-				tmp.append(addSpace(bnoStr, board.getBno())).append("|").append(addSpace(titleStr, board.getTitle()))
-						.append("|").append(addSpace(writerStr, board.getWriter())).append("|")
-						.append(addSpace(createdDateStr, board.getCreatedDate())).append("|\n");
-			}
-		}
-		if (boardList.size() == 0) {
-			tmp = new StringBuilder().append("글이 없습니다.");
-		}
-		String summaryString = tmp.toString();
-
-		defaultMethod(summaryString);
-	}
-
-
-	
-	
-	
-	
 	public void createContent() {
 		Board board = new Board();
 		try {
-			JSONObject jsonObject = new JSONObject();
-			jsonObject.put("position", "in-menu");
-			jsonObject.put("data", "제목> ");
+			JSONObject jsonObject = new JSONObject()
+					.put("position", "in-menu")
+					.put("data", "제목> ");
 			send(jsonObject.toString());
-			board.setTitle(new JSONObject(in.readUTF()).getString("command"));
+			board.setTitle( receiveCommand() );
 			
 			jsonObject.put("data", "내용> ");
 			send(jsonObject.toString());
-			board.setContent(new JSONObject(in.readUTF()).getString("command"));
+			board.setContent( receiveCommand() );
 			
 			jsonObject.put("data", "작성자> ");
 			send(jsonObject.toString());
-			board.setWriter(new JSONObject(in.readUTF()).getString("command"));
+			board.setWriter( receiveCommand() );
 		} catch (Exception e) {
+			String message = "글 작성 중 오류 발생.";
+			defaultMenu(backToMenu(message));
 			return;
 		}
 		boardService.insertOne(board);
 		String message = "글이 등록되었습니다.";
-		defaultMethod(new JSONObject().put("data", message).toString());
+		defaultMenu(backToMenu(message));
 	}
 
 	
-	
+
 	
 	
 	public void getDetailContent() {
 		int bno;
 		try {
-			JSONObject jsonObject = new JSONObject();
-			jsonObject.put("position", "in-menu");
-			jsonObject.put("data", "내용을 확인할 글 번호를 입력하세요> ");
+			JSONObject jsonObject = new JSONObject()
+						.put("position", "in-menu")
+						.put("data", "내용을 확인할 글 번호를 입력하세요> ");
 			send(jsonObject.toString());
-			String json = in.readUTF();
-			bno = Integer.valueOf(new JSONObject(json).get("command").toString());
+			bno = Integer.valueOf(receiveCommand());
 		} catch (Exception e) {
 			String message = "글 없음.";
-			defaultMethod( new JSONObject().put("data", message).toString());
+			defaultMenu( backToMenu(message) );
 			return;
 		}
 		Board board;
@@ -194,7 +163,7 @@ public class BoardController {
 					.append("수정일자 : ").append(board.getModifiedDate()).append("\n")
 					.toString();
 		}
-		defaultMethod( new JSONObject().put("data", message).toString());
+		defaultMenu( backToMenu(message) );
 	}
 
 	
@@ -204,15 +173,14 @@ public class BoardController {
 	public void deleteContent() {
 		int bno = 0;
 		try {
-			JSONObject jsonObject = new JSONObject();
-			jsonObject.put("position", "in-menu");
-			jsonObject.put("data", "삭제할 글 번호를 입력하세요> ");
+			JSONObject jsonObject = new JSONObject()
+						.put("position", "in-menu")
+						.put("data", "삭제할 글 번호를 입력하세요> ");
 			send(jsonObject.toString());
-			String json = in.readUTF();
-			bno = Integer.valueOf(new JSONObject(json).get("command").toString());
+			bno = Integer.valueOf( receiveCommand() );
 		} catch (Exception e) {
 			String message = "글이 없습니다.";
-			defaultMethod(new JSONObject().put("data", message).toString());
+			defaultMenu(backToMenu(message));
 			return;
 		}
 		String message = "글이 삭제되었습니다.";
@@ -221,7 +189,7 @@ public class BoardController {
 		} else {
 			message = "글이 없습니다.";
 		}
-		defaultMethod(new JSONObject().put("data", message).toString());
+		defaultMenu(backToMenu(message));
 	}
 
 	
@@ -231,9 +199,9 @@ public class BoardController {
 	public void modifyContent() {
 		int bno = 0;
 		try {
-			JSONObject jsonObject = new JSONObject();
-			jsonObject.put("position", "in-menu");
-			jsonObject.put("data", "수정할 글 번호를 입력하세요> ");
+			JSONObject jsonObject = new JSONObject()
+					.put("position", "in-menu")
+					.put("data", "수정할 글 번호를 입력하세요> ");
 			send(jsonObject.toString());
 			bno = Integer.valueOf(new JSONObject(in.readUTF()).get("command").toString());
 		} catch (Exception e) {
@@ -252,26 +220,25 @@ public class BoardController {
 						.append("작성일자 : ")	.append(board.getCreatedDate()).append("\n")
 						.append("수정일자 : ").append(board.getModifiedDate())	.append("\n")
 						.append("수정하시겠습니까? (Y/N)").toString();
-			}
-			if (message.equals("글 없음.")) {
-				defaultMethod(new JSONObject().put("data", message).toString());
+			} else {
+				defaultMenu(backToMenu(message));
 				return;
 			}
 			JSONObject jsonObject = new JSONObject();
 			jsonObject.put("position", "in-menu")
 					.put("data", message);
 			send(jsonObject.toString());
-			String menu = new JSONObject(in.readUTF()).get("command").toString();
-			if (!menu.equalsIgnoreCase("y")) {
+			String menu = receiveCommand();
+			if (!"y".equalsIgnoreCase(menu)) {
 				message = "수정 취소.";
-				defaultMethod(new JSONObject().put("data", message).toString());
+				defaultMenu( backToMenu(message));
 				return;
 			}
 			
 			message = "제목> " + board.getTitle() + "\n바꿀 제목(입력 안할 시 수정 안 됨)> ";
 			jsonObject.put("data", message);
 			send(jsonObject.toString());
-			String title = in.readUTF();
+			String title = receiveCommand();
 			if (title.equals("")) {
 				title = board.getTitle();
 			}
@@ -280,7 +247,7 @@ public class BoardController {
 			message =  "내용> " + board.getContent() + "\n바꿀 내용(입력 안할 시 수정 안 됨)> ";
 			jsonObject.put("data", message);
 			send(jsonObject.toString());
-			String content = new JSONObject(in.readUTF()).get("command").toString();
+			String content = receiveCommand();
 			if (content.equals("")) {
 				content = board.getContent();
 			}
@@ -289,7 +256,7 @@ public class BoardController {
 			message = "작성자> " + board.getWriter() + "\n작성자명(입력 안할 시 수정 안 됨)> ";
 			jsonObject.put("data", message);
 			send(jsonObject.toString());
-			String writer = in.readUTF();
+			String writer = receiveCommand();
 			if (writer.equals("")) {
 				writer = board.getWriter();
 			}
@@ -298,35 +265,39 @@ public class BoardController {
 			board.setCreatedDate(board.getCreatedDate());
 			
 		} catch (NullPointerException e) {
-			System.out.println("자료가 없습니다.");
+			message = "자료가 없습니다.";
+			defaultMenu(backToMenu(message));
 			return;
 		} catch (IOException e) {
 
 		}
 		boardService.updateOne(board);
 		message = "게시글 수정 완료.";
-		defaultMethod(new JSONObject().put("data", message).toString());
+		defaultMenu(backToMenu(message));
 	}
 
 	
-	public void defaultMethod() {
-		defaultMethod(new JSONObject().put("data", "").toString());
+	public void defaultMenu() {
+		defaultMenu(backToMenu(""));
 	}
 	
 	
-	public void defaultMethod(String receiveJson) {
+	public void defaultMenu(String receiveJson) {
 		JSONObject jsonObject = new JSONObject(receiveJson);
 		String data = "\n메뉴를 입력하세요.\n1. 목록  2. 등록  3. 내용  4. 삭제  5. 수정  0. 종료 > ";
-		jsonObject.put("position","main");
-		jsonObject.put("command","");
-		jsonObject.put("data", jsonObject.getString("data")+data);
-		String json = jsonObject.toString();
-		send(json);
+		jsonObject.put("position","main")
+				.put("command","")
+				.put("data", jsonObject.getString("data")+data);
+		send(jsonObject.toString());
 	}
 	
+	public String backToMenu(String message) {
+		return new JSONObject().put("data", message).toString();
+	}
 	
-	
-	
+	public String receiveCommand() throws IOException {
+		return new JSONObject(in.readUTF()).getString("command");
+	}
 	
 	public void close() {
 		try {
@@ -337,16 +308,10 @@ public class BoardController {
 		}
 	}
 
-	public void send(String occupy, String command) throws IOException {
-		out.writeUTF(occupy);
-		out.writeUTF(command);
-		out.flush();
-	}
-
 	public void send(String json){
 		try {
-		out.writeUTF(json);
-		out.flush();
+			out.writeUTF(json);
+			out.flush();
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
