@@ -47,7 +47,7 @@ public class BoardServer{
 	private ServerSocket serverSocket;
 	private ExecutorService threadPool = Executors.newFixedThreadPool(100);
 	private final int PORT = 7878;
-	private Map<String, SocketClient> boardConn = Collections.synchronizedMap(new HashMap<String, SocketClient>()) ;
+	private Map<String, SocketClient> boardConn = Collections.synchronizedMap(new HashMap<String, SocketClient>());
 	
 
 	public void removeSocketClient(SocketClient socketClient) {

@@ -14,7 +14,7 @@ public class BoardClient {
 	public static void main(String[] args) {
 		try {
 			BoardClient boardClient = new BoardClient();
-			boardClient.setPosition("main");
+			position = "main";
 			boardClient.connect();
 			String command = "";
 
@@ -36,7 +36,7 @@ public class BoardClient {
 					break;
 
 				jsonObject = new JSONObject();
-				jsonObject.put("position", boardClient.getPosition());
+				jsonObject.put("position", position);
 				jsonObject.put("command", command);
 
 				boardClient.send(jsonObject.toString());
@@ -57,7 +57,7 @@ public class BoardClient {
 				while (true) {
 					String json = in.readUTF();
 					JSONObject root = new JSONObject(json);
-					setPosition(root.getString("position"));
+					position = root.getString("position");
 					String data = root.getString("data");
 					System.out.println(data);
 				}
@@ -85,13 +85,6 @@ public class BoardClient {
 		System.out.println("서버에 연결 되었습니다.");
 	}
 
-	public synchronized void setPosition(String position) {
-		BoardClient.position = position;
-	}
-
-	public synchronized String getPosition() {
-		return position;
-	}
 
 	public void send(String json) throws IOException {
 		out.writeUTF(json);
