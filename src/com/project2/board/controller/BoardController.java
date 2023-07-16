@@ -37,6 +37,7 @@ public class BoardController {
 		String command = "1";
 		try {
 			while (true) {
+				List<Board> allBoardList = boardService.findAll();
 				List<Board> boardList = boardService.findPartialinPage(page);
 				
 				String position = "in-menu";
@@ -46,11 +47,14 @@ public class BoardController {
 				String writerStr = "  작성자        ";
 				String createdDateStr = " 작성 날짜                          ";
 				int allPage = 1;
-				if(boardList == null ) {
+				if (page==0) {
+					tmp = new StringBuilder().append("메뉴로 이동합니다.");
+					command = "0";
+				} else if(allBoardList == null ) {
 					tmp = new StringBuilder().append("글이 없습니다.");
 					command = "0";
 				} else {
-					int allPost = boardService.findAll().size();
+					int allPost = allBoardList.size();
 					allPage= (allPost-1)/5+1;
 					tmp.append("===============================================================================================\n")
 						.append("|").append(bnoStr).append(" |")
@@ -76,12 +80,11 @@ public class BoardController {
 				JSONObject jsonObject = new JSONObject()
 						.put("position", position)
 						.put("data",summaryString);
-				String json = jsonObject.toString();
 				if("0".equals(command)) {
-					defaultMenu(json);
+					defaultMenu(jsonObject);
 					return;
 				}
-				send(json);
+				send(jsonObject);
 				
 				command = receiveCommand();
 
@@ -113,15 +116,15 @@ public class BoardController {
 			JSONObject jsonObject = new JSONObject()
 					.put("position", "in-menu")
 					.put("data", "제목> ");
-			send(jsonObject.toString());
+			send(jsonObject);
 			board.setTitle( receiveCommand() );
 			
 			jsonObject.put("data", "내용> ");
-			send(jsonObject.toString());
+			send(jsonObject);
 			board.setContent( receiveCommand() );
 			
 			jsonObject.put("data", "작성자> ");
-			send(jsonObject.toString());
+			send(jsonObject);
 			board.setWriter( receiveCommand() );
 		} catch (Exception e) {
 			String message = "글 작성 중 오류 발생.";
@@ -143,7 +146,7 @@ public class BoardController {
 			JSONObject jsonObject = new JSONObject()
 						.put("position", "in-menu")
 						.put("data", "내용을 확인할 글 번호를 입력하세요> ");
-			send(jsonObject.toString());
+			send(jsonObject);
 			bno = Integer.valueOf(receiveCommand());
 		} catch (Exception e) {
 			String message = "글 없음.";
@@ -176,7 +179,7 @@ public class BoardController {
 			JSONObject jsonObject = new JSONObject()
 						.put("position", "in-menu")
 						.put("data", "삭제할 글 번호를 입력하세요> ");
-			send(jsonObject.toString());
+			send(jsonObject);
 			bno = Integer.valueOf( receiveCommand() );
 		} catch (Exception e) {
 			String message = "글이 없습니다.";
@@ -202,7 +205,7 @@ public class BoardController {
 			JSONObject jsonObject = new JSONObject()
 					.put("position", "in-menu")
 					.put("data", "수정할 글 번호를 입력하세요> ");
-			send(jsonObject.toString());
+			send(jsonObject);
 			bno = Integer.valueOf(new JSONObject(in.readUTF()).get("command").toString());
 		} catch (Exception e) {
 			return;
@@ -227,7 +230,7 @@ public class BoardController {
 			JSONObject jsonObject = new JSONObject();
 			jsonObject.put("position", "in-menu")
 					.put("data", message);
-			send(jsonObject.toString());
+			send(jsonObject);
 			String menu = receiveCommand();
 			if (!"y".equalsIgnoreCase(menu)) {
 				message = "수정 취소.";
@@ -237,7 +240,7 @@ public class BoardController {
 			
 			message = "제목> " + board.getTitle() + "\n바꿀 제목(입력 안할 시 수정 안 됨)> ";
 			jsonObject.put("data", message);
-			send(jsonObject.toString());
+			send(jsonObject);
 			String title = receiveCommand();
 			if (title.equals("")) {
 				title = board.getTitle();
@@ -246,7 +249,7 @@ public class BoardController {
 			
 			message =  "내용> " + board.getContent() + "\n바꿀 내용(입력 안할 시 수정 안 됨)> ";
 			jsonObject.put("data", message);
-			send(jsonObject.toString());
+			send(jsonObject);
 			String content = receiveCommand();
 			if (content.equals("")) {
 				content = board.getContent();
@@ -255,7 +258,7 @@ public class BoardController {
 			
 			message = "작성자> " + board.getWriter() + "\n작성자명(입력 안할 시 수정 안 됨)> ";
 			jsonObject.put("data", message);
-			send(jsonObject.toString());
+			send(jsonObject);
 			String writer = receiveCommand();
 			if (writer.equals("")) {
 				writer = board.getWriter();
@@ -282,17 +285,17 @@ public class BoardController {
 	}
 	
 	
-	public void defaultMenu(String receiveJson) {
-		JSONObject jsonObject = new JSONObject(receiveJson);
+	public void defaultMenu(JSONObject jsonObject) {
+		System.out.println("메인 메뉴");
 		String data = "\n메뉴를 입력하세요.\n1. 목록  2. 등록  3. 내용  4. 삭제  5. 수정  0. 종료 > ";
 		jsonObject.put("position","main")
 				.put("command","")
 				.put("data", jsonObject.getString("data")+data);
-		send(jsonObject.toString());
+		send(jsonObject);
 	}
 	
-	public String backToMenu(String message) {
-		return new JSONObject().put("data", message).toString();
+	public JSONObject backToMenu(String message) {
+		return new JSONObject().put("data", message);
 	}
 	
 	public String receiveCommand() throws IOException {
@@ -308,9 +311,9 @@ public class BoardController {
 		}
 	}
 
-	public void send(String json){
+	public void send(JSONObject json){
 		try {
-			out.writeUTF(json);
+			out.writeUTF(json.toString());
 			out.flush();
 		} catch (Exception e) {
 			// TODO: handle exception

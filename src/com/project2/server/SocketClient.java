@@ -63,7 +63,6 @@ public class SocketClient {
 			try {
 				boardServer.addSocketClient(this);
 				while(true) {
-					//System.out.println(receiveJson.toString());
 					String command = new JSONObject(in.readUTF()).getString("command");
 					
 					if("1".equals(command)) {
@@ -99,9 +98,9 @@ public class SocketClient {
 	}
 
 
-	public void send(String json) {
+	public void send(JSONObject jsonObject) {
 		try {
-			out.writeUTF(json);
+			out.writeUTF(jsonObject.toString());
 			out.flush();
 		} catch(Exception e) {
 			

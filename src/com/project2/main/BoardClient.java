@@ -13,30 +13,30 @@ public class BoardClient {
 	public static void main(String[] args) {
 		try {
 			BoardClient boardClient = new BoardClient();
-			position = "main";
+			setPosition("main");
 			String command = "";
 			boardClient.connect();
 
 			JSONObject jsonObject = new JSONObject()
-					.put("position", position)
+					.put("position", getPosition())
 					.put("data", "")
 					.put("command", command);
 
-			boardClient.send(jsonObject.toString());
+			boardClient.send(jsonObject);
 			boardClient.receive();
 
 			Scanner scanner = new Scanner(System.in);
 
 			while (true) {
 				command = scanner.nextLine();
-				if ("0".equals(command) && "main".equals(position))
+				if ("0".equals(command) && "main".equals(getPosition()))
 					break;
 
 				jsonObject = new JSONObject()
-						.put("position", position)
+						.put("position", getPosition())
 						.put("command", command);
 
-				boardClient.send(jsonObject.toString());
+				boardClient.send(jsonObject);
 			}
 
 			scanner.close();
@@ -49,11 +49,10 @@ public class BoardClient {
 
 	private void receive() {
 		Thread thread = new Thread(() -> {
-			// TODO Auto-generated method stub
 			try {
 				while (true) {
 					JSONObject receive = new JSONObject(in.readUTF());
-					position = receive.getString("position");
+					setPosition(receive.getString("position"));
 					String data = receive.getString("data");
 					System.out.println(data);
 				}
@@ -73,6 +72,16 @@ public class BoardClient {
 	private final int PORT = 7878;
 	private static String position;
 
+	
+	
+	public synchronized static String getPosition() {
+		return position;
+	}
+
+	public synchronized static void setPosition(String position) {
+		BoardClient.position = position;
+	}
+
 	private void connect() throws IOException {
 		socket = new Socket(serverIP, PORT);
 		in = new DataInputStream(socket.getInputStream());
@@ -82,8 +91,8 @@ public class BoardClient {
 	}
 
 
-	public void send(String json) throws IOException {
-		out.writeUTF(json);
+	public void send(JSONObject jsonObject) throws IOException {
+		out.writeUTF(jsonObject.toString());
 		out.flush();
 	}// send()
 

@@ -38,17 +38,24 @@ public class BoardDAO {
 			if(!Files.exists(projectPath))	Files.createDirectory(projectPath);
 			if(!Files.exists(boardPath))	Files.createDirectory(boardPath);
 			if(!Files.exists(bnoPath))		{
-		    	bw = new BufferedWriter(new FileWriter(bnoPathString, false));
+		    	bw = new BufferedWriter(new FileWriter(bnoPathString));
 		    	bw.write(String.valueOf(0));
-		    	bw.close();
-			}
-			if(!Files.exists(bcntPath)) {
-				bw = new BufferedWriter(new FileWriter(bcntPathString, false));
-		    	bw.write(String.valueOf(0));
-		    	bw.close();
 			}
 		}catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("파일 생성 오류");
+		} finally {
+			try {
+				bw.close();
+			} catch (Exception e2) {
+			}
+		}
+		try {
+			if(!Files.exists(bcntPath)) {
+				bw = new BufferedWriter(new FileWriter(bcntPathString));
+		    	bw.write(String.valueOf(0));
+			}
+		}catch (IOException e) {
+			System.out.println("파일 생성 오류");
 		} finally {
 			try {
 				bw.close();
@@ -59,34 +66,35 @@ public class BoardDAO {
 
 	public List<Board> getAllinPage(int page){
 		int bno = 0;
-		List<Board> boardList = new ArrayList<>();
 		try {
 			br = new BufferedReader(new FileReader(bnoPathString));
 			bno = Integer.valueOf(br.readLine());
+			
 		} catch (Exception e) {
 			System.out.println("bno.txt 파일 이상 발생");
-			return boardList;
+			return null;
 		} finally {
 			try {
 			br.close();
 			} catch (Exception e2) {
+				
 			}
 		}
-		
+		List<Board> boardList = new ArrayList<>();
+		List<Board> boardTmpList = new ArrayList<>();
 		try {
-			List<Board> boardTmpList = new ArrayList<>();
 			for(int no=bno;no >= 1;no--) {
 				if(page*5 <= boardTmpList.size()) break;
 				Board board = getOne(no);
 				if(board == null ) continue;
 				boardTmpList.add(board);
 			}
-			if(boardTmpList.size() == 0)  throw new Exception();
 			for(int no =(page-1)*5 ; no<boardTmpList.size();no++) {
 				boardList.add(boardTmpList.get(no));
 			}
+			if(boardList == null)  throw new Exception();
 		}catch (Exception e) {
-			System.out.println("자료가 없습니다.");
+			System.out.println("목록 출력 종료");
 			return null;
 		}
 		
@@ -103,16 +111,14 @@ public class BoardDAO {
 			bno = Integer.valueOf(br.readLine());
 		} catch (Exception e) {
 			System.out.println("bno.txt 파일 이상 발생");
-			return boardList;
+			return null;
 		} finally {
 			try {
 			br.close();
 			} catch (Exception e) {
-				// TODO: handle exception
 			}
 		}
 		try {
-
 			for(int no = 1 ; no <= bno ; no++) {
 				Board board = getOne(no);
 				if(board == null) continue;
@@ -120,7 +126,7 @@ public class BoardDAO {
 			}
 			if(boardList.size() == 0)  throw new Exception();
 		} catch (Exception e) {
-			System.out.println("자료가 없습니다.");
+			System.out.println("글이 없습니다.");
 			return null;
 		}
 		return boardList;
@@ -132,42 +138,81 @@ public class BoardDAO {
 		try {
 			br= new BufferedReader(new FileReader(bnoPathString));
 			bno = Integer.valueOf(br.readLine());
-			br.close();
+		} catch (Exception e) {
+			System.out.println("bno.txt 파일 이상 발생");
+			return;
+		} finally {
+			try {
+				br.close();	
+			} catch (Exception e2) {
+				// TODO: handle exception
+			}
+		}
+		
+		try {
 			br = new BufferedReader(new FileReader(bcntPathString));
 			bcnt = Integer.valueOf(br.readLine());
-			br.close();
 		} catch (Exception e) {
-			System.out.println("bno.txt, bcnt.txt 파일 이상 발생");
+			System.out.println("bcnt.txt 파일 이상 발생");
 			return;
+		} finally {
+			try {
+				br.close();	
+			} catch (Exception e2) {
+			}
 		}
+		
 		localDateTime = LocalDateTime.of(LocalDate.now(), LocalTime.now());
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MMM dd, yyyy, h:mm:ss a");
 		String date = localDateTime.format(dtf);
 	    try {
 	    	bw = new BufferedWriter(new FileWriter(bnoPathString));
 	    	bw.write(String.valueOf(++bno));
-	    	bw.close();
-	    	
-	    	String writeFileName = bPathString + bno + ".txt";
-	    	StringBuilder tmp = new StringBuilder();
-	    	tmp.append(bno).append('\n')
+	    } catch (Exception e) {
+	    	System.out.println("bnt.txt 파일 오류");
+	    	return;
+		} finally {
+			try {
+				bw.close();
+			}catch (Exception e) {
+			}
+		}
+	    String writeFileName = bPathString + bno + ".txt";
+	    StringBuilder tmp = new StringBuilder()
+	    		.append(bno).append('\n')
 	    		.append(board.getTitle()).append('\n')
 	    		.append(board.getContent()).append('\n')
 	    		.append(board.getWriter()).append('\n')
 	    		.append(date).append('\n')
 	    		.append(date).append('\n');
+
+	    try {
 	    	bw = new BufferedWriter(new FileWriter(writeFileName));
 	    	bw.write(tmp.toString());
-	    	bw.close();
-	    	
+	    } catch (Exception e) {
+	    	System.out.println("file 생성 오류");
+	    	return;
+		} finally {
+			try {
+				bw.close();
+			}catch (Exception e) {
+			}
+		}
+	    
+	    try {
 	    	bw = new BufferedWriter(new FileWriter(bcntPathString));
 	    	bw.write(String.valueOf(++bcnt));
 	    	bw.close();
 	    	
 	    } catch(Exception e) {
-	    	System.out.println("insert 오류");
+	    	System.out.println("bcnt.txt 파일 오류");
 	    	return;
-	    }
+	    } finally {
+			try {
+				bw.close();
+			}catch (Exception e) {
+			}
+		}
 
 		System.out.println("글 작성이 완료되었습니다.");
 	}
@@ -236,21 +281,20 @@ public class BoardDAO {
 	}
 	
 	public void update(Board board) {
-		LocalDateTime localDateTime = null;
-		localDateTime = LocalDateTime.of(LocalDate.now(), LocalTime.now());
+		LocalDateTime localDateTime = LocalDateTime.of(LocalDate.now(), LocalTime.now());
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MMM dd, yyyy, h:mm:ss a");
 		String date = localDateTime.format(dtf);
 
+		String writeFileName = bPathString + board.getBno() + ".txt";
+		StringBuilder tmp = new StringBuilder()
+				.append(board.getBno()).append('\n')
+				.append(board.getTitle()).append('\n')
+				.append(board.getContent()).append('\n')
+				.append(board.getWriter()).append('\n')
+				.append(board.getCreatedDate()).append('\n')
+				.append(date).append('\n');
 		
 	    try {
-	    	String writeFileName = bPathString + board.getBno() + ".txt";
-	    	StringBuilder tmp = new StringBuilder()
-	    		.append(board.getBno()).append('\n')
-	    		.append(board.getTitle()).append('\n')
-	    		.append(board.getContent()).append('\n')
-	    		.append(board.getWriter()).append('\n')
-	    		.append(board.getCreatedDate()).append('\n')
-	    		.append(date).append('\n');
 	    	bw = new BufferedWriter(new FileWriter(writeFileName));
 	    	bw.write(tmp.toString());
 	    	

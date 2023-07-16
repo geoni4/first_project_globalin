@@ -65,12 +65,12 @@ public class BoardServer{
 	}
 	
 	public void send(SocketClient sender, String command) {
-		JSONObject root = new JSONObject();
-		root.put("randomNum",  sender.getRandomNum())
-			.put("clientIP",  sender.getClientIP())
-			.put("command",  command);
+		JSONObject jsonObject = new JSONObject()
+				.put("randomNum",  sender.getRandomNum())
+				.put("clientIP",  sender.getClientIP())
+				.put("command",  command);
 		
-		sender.send(root.toString());
+		sender.send(jsonObject);
 	}
 	
 
