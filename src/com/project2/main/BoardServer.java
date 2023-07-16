@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.json.JSONObject;
 
 import com.project2.server.SocketClient;
 
@@ -23,7 +22,6 @@ public class BoardServer{
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 	}
 	
 	private void start() throws IOException{
@@ -64,15 +62,7 @@ public class BoardServer{
 		System.out.println("현재 접속인원 수: " + boardConn.size() + '\n');
 	}
 	
-	public void send(SocketClient sender, String command) {
-		JSONObject jsonObject = new JSONObject()
-				.put("randomNum",  sender.getRandomNum())
-				.put("clientIP",  sender.getClientIP())
-				.put("command",  command);
-		
-		sender.send(jsonObject);
-	}
-	
+
 
 	public void stop() {
 		try {

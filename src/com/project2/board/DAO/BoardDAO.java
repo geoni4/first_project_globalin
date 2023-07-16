@@ -3,7 +3,6 @@ package com.project2.board.DAO;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -92,7 +91,6 @@ public class BoardDAO {
 			for(int no =(page-1)*5 ; no<boardTmpList.size();no++) {
 				boardList.add(boardTmpList.get(no));
 			}
-			if(boardList == null)  throw new Exception();
 		}catch (Exception e) {
 			System.out.println("목록 출력 종료");
 			return null;
@@ -145,7 +143,6 @@ public class BoardDAO {
 			try {
 				br.close();	
 			} catch (Exception e2) {
-				// TODO: handle exception
 			}
 		}
 		
@@ -275,7 +272,6 @@ public class BoardDAO {
 			try {
 				bw.close();
 			}catch (Exception e) {
-				// TODO: handle exception
 			}
 		}
 	}

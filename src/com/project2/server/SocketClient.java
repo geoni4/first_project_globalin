@@ -97,15 +97,6 @@ public class SocketClient {
 		});
 	}
 
-
-	public void send(JSONObject jsonObject) {
-		try {
-			out.writeUTF(jsonObject.toString());
-			out.flush();
-		} catch(Exception e) {
-			
-		}
-	}//send()
 	
 	
 	public void close() {

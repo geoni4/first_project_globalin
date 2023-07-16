@@ -227,8 +227,8 @@ public class BoardController {
 				defaultMenu(backToMenu(message));
 				return;
 			}
-			JSONObject jsonObject = new JSONObject();
-			jsonObject.put("position", "in-menu")
+			JSONObject jsonObject = new JSONObject()
+					.put("position", "in-menu")
 					.put("data", message);
 			send(jsonObject);
 			String menu = receiveCommand();
