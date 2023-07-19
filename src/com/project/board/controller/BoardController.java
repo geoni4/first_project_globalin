@@ -330,9 +330,8 @@ public class BoardController {
 
 	
 	public String addSpace(String std, String insertStr) {
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder().append(" ");
 		String tmp = insertStr;
-		sb.append(" ");
 		if(toAsciiLength(std) <= toAsciiLength(insertStr)) {
 			tmp = insertStr.substring(0, getIdx(std, insertStr));
 			tmp += "...";
