@@ -35,7 +35,7 @@ public class BoardController {
 		String command = "1";
 		try {
 			while (true) {
-				List<Board> allBoardList = boardService.findAll();
+				int allPost = boardService.cntAllPost();
 				List<Board> boardList = boardService.findPartialinPage(page);
 				
 				String position = "in-menu";
@@ -44,16 +44,14 @@ public class BoardController {
 				String titleStr = "  제목                ";
 				String writerStr = "  작성자        ";
 				String createdDateStr = " 작성 날짜                          ";
-				int allPage = 1;
+				int allPage = (allPost-1)/5+1;
 				if (page==0) {
 					tmp = new StringBuilder().append("메뉴로 이동합니다.");
 					command = "0";
-				} else if(allBoardList == null ) {
+				} else if(allPost == 0 ) {
 					tmp = new StringBuilder().append("글이 없습니다.");
 					command = "0";
 				} else {
-					int allPost = allBoardList.size();
-					allPage= (allPost-1)/5+1;
 					tmp.append("===============================================================================================\n")
 						.append("|").append(bnoStr).append(" |")
 						.append(titleStr).append(" |")
@@ -314,7 +312,7 @@ public class BoardController {
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
-	}//send()
+	}
 	
 	
 	

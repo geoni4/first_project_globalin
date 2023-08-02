@@ -16,9 +16,8 @@ public class BoardService {
 	public List<Board> findPartialinPage(int page){
 		return dao.getAllinPage(page);
 	}
-
-	public List<Board> findAll(){
-		return dao.getAll();
+	public int cntAllPost() {
+		return dao.cntAllPost();
 	}
 	
 	
@@ -39,6 +38,11 @@ public class BoardService {
 		
 	}
 	
+	
+	
+//	public List<Board> findAll(){
+//		return dao.getAll();
+//	}
 	
 	
 }

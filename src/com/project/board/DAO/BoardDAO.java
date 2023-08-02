@@ -100,35 +100,23 @@ public class BoardDAO {
 		return boardList;
 	}
 	
-	
-	public List<Board> getAll(){
-		int bno = 0;
-		List<Board> boardList = new ArrayList<>();
+	public int cntAllPost() {
+		int bcnt = 0;
 		try {
-			br = new BufferedReader(new FileReader(bnoPathString));
-			bno = Integer.valueOf(br.readLine());
+			br = new BufferedReader(new FileReader(bcntPathString));
+			bcnt = Integer.valueOf(br.readLine());
 		} catch (Exception e) {
-			System.out.println("bno.txt 파일 이상 발생");
-			return null;
+			System.out.println("bcnt.txt 파일 이상 발생");
+			return bcnt;
 		} finally {
 			try {
-			br.close();
-			} catch (Exception e) {
+				br.close();	
+			} catch (Exception e2) {
 			}
 		}
-		try {
-			for(int no = 1 ; no <= bno ; no++) {
-				Board board = getOne(no);
-				if(board == null) continue;
-				boardList.add(board);
-			}
-			if(boardList.size() == 0)  throw new Exception();
-		} catch (Exception e) {
-			System.out.println("글이 없습니다.");
-			return null;
-		}
-		return boardList;
+		return bcnt;
 	}
+	
 	
 	public void insert(Board board) {
 		LocalDateTime localDateTime = null;
@@ -214,6 +202,8 @@ public class BoardDAO {
 		System.out.println("글 작성이 완료되었습니다.");
 	}
 	
+	
+	
 	public Board getOne(int bno) {
 		
 		Board board =null;
@@ -249,7 +239,7 @@ public class BoardDAO {
 			br = new BufferedReader(new FileReader(bcntPathString));
 	    	bcnt = Integer.valueOf(br.readLine());
 		} catch (Exception e) {
-			System.out.println("cnt.txt 접근 실패");
+			System.out.println("bcnt.txt 접근 실패");
 			return false;
 		} finally {
 			try {
@@ -306,6 +296,38 @@ public class BoardDAO {
 	    }
 		System.out.println("글 수정이 완료되었습니다.");
 	}
+	
+//	public List<Board> getAll(){
+//	int bno = 0;
+//	List<Board> boardList = new ArrayList<>();
+//	try {
+//		br = new BufferedReader(new FileReader(bnoPathString));
+//		bno = Integer.valueOf(br.readLine());
+//	} catch (Exception e) {
+//		System.out.println("bno.txt 파일 이상 발생");
+//		return null;
+//	} finally {
+//		try {
+//		br.close();
+//		} catch (Exception e) {
+//		}
+//	}
+//	try {
+//		for(int no = 1 ; no <= bno ; no++) {
+//			Board board = getOne(no);
+//			if(board == null) continue;
+//			boardList.add(board);
+//		}
+//		if(boardList.size() == 0)  throw new Exception();
+//	} catch (Exception e) {
+//		System.out.println("글이 없습니다.");
+//		return null;
+//	}
+//	return boardList;
+//}
+
+	
+	
 }
 
 
